@@ -8,11 +8,6 @@ from django.utils import timezone
 from project.settings import TIME_ZONE
 
 
-def convert_datetime_tz_plus_3(datetime_to_convert):
-    msc_tz = pytz.timezone(TIME_ZONE)
-    return datetime_to_convert.astimezone(msc_tz)
-
-
 class Passcard(models.Model):
     is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now=True)
@@ -73,18 +68,18 @@ class Visit(models.Model):
         return random_day.strftime('%H:%M')
 
     def get_duration(self):
-        entered_at = convert_datetime_tz_plus_3(self.entered_at)
+        entered_at = timezone.localtime(self.entered_at)
         leaved_at = (
-            convert_datetime_tz_plus_3(self.leaved_at)
+            timezone.localtime(self.leaved_at)
             if self.leaved_at
             else timezone.localtime()
         )
         return self.format_duration(leaved_at - entered_at)
 
     def is_long(self, minutes=60):
-        entered_at = convert_datetime_tz_plus_3(self.entered_at)
+        entered_at = timezone.localtime(self.entered_at)
         leaved_at = (
-            convert_datetime_tz_plus_3(self.leaved_at)
+            timezone.localtime(self.leaved_at)
             if self.leaved_at
             else timezone.localtime()
         )
