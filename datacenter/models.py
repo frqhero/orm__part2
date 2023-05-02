@@ -59,25 +59,23 @@ class Visit(models.Model):
         month_number_with_brackets = f'<{month_number}>'
         return entered_at.replace(month_number_with_brackets, month_name)
 
+    def get_time_spent(self):
+        entered_at = timezone.localtime(self.entered_at)
+        leaved_at_or_now = (
+            timezone.localtime(self.leaved_at)
+            if self.leaved_at
+            else timezone.localtime()
+        )
+        return leaved_at_or_now - entered_at
+
     def format_duration(self, timedelta):
         random_day = datetime.datetime(1970, 1, 1) + timedelta
         return random_day.strftime('%H:%M')
 
     def get_duration(self):
-        entered_at = timezone.localtime(self.entered_at)
-        leaved_at_or_now = (
-            timezone.localtime(self.leaved_at)
-            if self.leaved_at
-            else timezone.localtime()
-        )
-        return self.format_duration(leaved_at_or_now - entered_at)
+        time_spent = self.get_time_spent()
+        return self.format_duration(time_spent)
 
     def is_long(self, minutes=60):
-        entered_at = timezone.localtime(self.entered_at)
-        leaved_at_or_now = (
-            timezone.localtime(self.leaved_at)
-            if self.leaved_at
-            else timezone.localtime()
-        )
-        timedelta = leaved_at_or_now - entered_at
-        return timedelta.total_seconds() > minutes * 60
+        time_spent = self.get_time_spent()
+        return time_spent.total_seconds() > minutes * 60
