@@ -41,7 +41,7 @@ class Visit(models.Model):
         pattern = r'<([^<>]+)>'
         match = re.search(pattern, entered_at)
         month_number = match.group(1)
-        months_list = [
+        months_names = [
             'января',
             'февраля',
             'марта',
@@ -55,7 +55,7 @@ class Visit(models.Model):
             'ноября',
             'декабря',
         ]
-        month_name = months_list[int(month_number) - 1]
+        month_name = months_names[int(month_number) - 1]
         month_number_with_brackets = f'<{month_number}>'
         return entered_at.replace(month_number_with_brackets, month_name)
 
