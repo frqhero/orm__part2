@@ -1,11 +1,8 @@
 import datetime
-import pytz
 import re
 
 from django.db import models
 from django.utils import timezone
-
-from project.settings import TIME_ZONE
 
 
 class Passcard(models.Model):
@@ -38,8 +35,7 @@ class Visit(models.Model):
         )
 
     def get_entered_at(self):
-        timezone = pytz.timezone(TIME_ZONE)
-        entered_at = self.entered_at.astimezone(timezone).strftime(
+        entered_at = timezone.localtime(self.entered_at).strftime(
             '%d <%m> %Y г. %H:%M'
         )
         pattern = r'<([^<>]+)>'
@@ -59,9 +55,9 @@ class Visit(models.Model):
             'ноября',
             'декабря',
         ]
-        newvalue = months_list[int(month_number) - 1]
-        oldvalue = f'<{month_number}>'
-        return entered_at.replace(oldvalue, newvalue)
+        month_name = months_list[int(month_number) - 1]
+        month_number_with_brackets = f'<{month_number}>'
+        return entered_at.replace(month_number_with_brackets, month_name)
 
     def format_duration(self, timedelta):
         random_day = datetime.datetime(1970, 1, 1) + timedelta
@@ -69,19 +65,19 @@ class Visit(models.Model):
 
     def get_duration(self):
         entered_at = timezone.localtime(self.entered_at)
-        leaved_at = (
+        leaved_at_or_now = (
             timezone.localtime(self.leaved_at)
             if self.leaved_at
             else timezone.localtime()
         )
-        return self.format_duration(leaved_at - entered_at)
+        return self.format_duration(leaved_at_or_now - entered_at)
 
     def is_long(self, minutes=60):
         entered_at = timezone.localtime(self.entered_at)
-        leaved_at = (
+        leaved_at_or_now = (
             timezone.localtime(self.leaved_at)
             if self.leaved_at
             else timezone.localtime()
         )
-        timedelta = leaved_at - entered_at
+        timedelta = leaved_at_or_now - entered_at
         return timedelta.total_seconds() > minutes * 60
