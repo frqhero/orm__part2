@@ -6,9 +6,9 @@ from datacenter.models import Passcard
 def passcard_info_view(request, passcode):
     passcard = get_object_or_404(Passcard, passcode=passcode)
     passcard_visits = passcard.visit_set.all()
-    this_passcard_visits = []
+    passcard_visits_serialized = []
     for visit in passcard_visits:
-        this_passcard_visits.append(
+        passcard_visits_serialized.append(
             {
                 'entered_at': visit.get_entered_at(),
                 'duration': visit.get_duration(),
@@ -17,6 +17,6 @@ def passcard_info_view(request, passcode):
         )
     context = {
         'passcard': passcard,
-        'this_passcard_visits': this_passcard_visits
+        'this_passcard_visits': passcard_visits_serialized
     }
     return render(request, 'passcard_info.html', context)
