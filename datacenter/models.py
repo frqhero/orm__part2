@@ -69,8 +69,10 @@ class Visit(models.Model):
         return leaved_at_or_now - entered_at
 
     def format_duration(self, timedelta):
-        random_day = datetime.datetime(1970, 1, 1) + timedelta
-        return random_day.strftime('%H:%M')
+        hours, minutes = divmod(timedelta.total_seconds(), 3600)
+        minutes //= 60
+        hours, minutes = int(hours), int(minutes)
+        return f'{hours:02d}:{minutes:02d}'
 
     def get_duration(self):
         time_spent = self.get_time_spent()
