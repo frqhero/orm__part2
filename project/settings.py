@@ -1,26 +1,22 @@
 import os
 
 from environs import Env
+import dj_database_url
+
 
 env = Env()
 env.read_env()
 
-DATABASES = {
-    'default': {
-        'ENGINE': env('ENGINE'),
-        'HOST': env('HOST'),
-        'PORT': env('PORT'),
-        'NAME': env('NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('PASSWORD'),
-    }
-}
+
+db_url = env('DB_URL')
+DATABASES = {'default': dj_database_url.config(default=db_url)}
+
 
 INSTALLED_APPS = ['datacenter']
 
 SECRET_KEY = 'REPLACE_ME'
 
-DEBUG = env.bool('DEBUG')
+DEBUG = env.bool('DEBUG', True)
 
 ROOT_URLCONF = 'project.urls'
 
